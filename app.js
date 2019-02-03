@@ -4,17 +4,30 @@ const { buildSchema } = require('graphql')
 
 const app = express()
 
+const books = []
+
 app.use(express.json())
 
 app.use('/graphql', graphqlHttp({
   schema: buildSchema(`
+    type Book {
+      _id: ID!
+      title: String!
+      description: String!
+      createdDate: String!
+    }
+
+    input BookInput {
+      title: String!
+      description: String!
+    }
+
     type RootQuery {
-      events: [String!]!
+      books: [Book!]!
     }
 
     type RootMutation {
-      createEvent(name: String) : String
-
+      createBook(bookInput: BookInput) : Book
     }
     
     schema {
@@ -23,12 +36,23 @@ app.use('/graphql', graphqlHttp({
     }
   `),
   rootValue: {
-    events: () => {
-      return ['Apple picking', 'Bear hunting', 'Canada admiring']
+    books: () => {
+      // return ['Apple picking', 'Bear hunting', 'Canada admiring']
+      return books
     },
-    createEvent: (args) => {
-      const eventName = args.name
-      return eventName
+    createBook: (args) => {
+      const { bookInput } = args
+
+      const book = {
+        _id: Math.random().toString(),
+        title: bookInput.title,
+        description: bookInput.description,
+        createdDate: new Date().toISOString()
+      }
+
+      books.push(book)
+
+      return book
     }
   },
   graphiql: true
