@@ -11,16 +11,12 @@ const bookSchema = new Schema({
     type: String,
     required: true
   },
-  createdDate: {
-    type: Date,
-    required: true
-  },
   authors: [
     {
       type: Schema.Types.ObjectId,
       ref: 'Author'
     }
   ]
-})
+}, { timestamps: true })
 
 module.exports = mongoose.model('Book', bookSchema)

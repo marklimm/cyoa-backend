@@ -5,8 +5,9 @@ module.exports = buildSchema(`
       _id: ID!
       title: String!
       description: String!
-      createdDate: String!
       authors: [Author!]
+      createdAt: String!
+      updatedAt: String!
     }
 
     input BookInput {
@@ -19,8 +20,9 @@ module.exports = buildSchema(`
       firstName: String!
       lastName: String!
       description: String
-      createdDate: String!
       books: [Book!]
+      createdAt: String!
+      updatedAt: String!
     }
 
     input AuthorInput {
@@ -33,7 +35,8 @@ module.exports = buildSchema(`
       _id: ID!
       email: String!
       password: String
-      createdDate: String!
+      createdAt: String!
+      updatedAt: String!
     }
 
     input UserInput {

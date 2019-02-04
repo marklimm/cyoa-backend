@@ -5,11 +5,13 @@ const Book = require('../../models/book')
 const User = require('../../models/user')
 
 const inflateBooks = books => {
+  console.log('books', books)
   return books.map(book => {
     return {
       ...book._doc,
-      createdDate: new Date(book._doc.createdDate).toISOString(),
-      authors: getAuthorsByAuthorIds.bind(this, book.authors)
+      authors: getAuthorsByAuthorIds.bind(this, book.authors),
+      createdAt: new Date(book._doc.createdAt).toISOString(),
+      updatedAt: new Date(book._doc.updatedAt).toISOString()
     }
   })
 }
@@ -18,8 +20,9 @@ const inflateAuthors = authors => {
   return authors.map(author => {
     return {
       ...author._doc,
-      createdDate: new Date(author._doc.createdDate).toISOString(),
-      books: getBooksByBookIds.bind(this, author.books)
+      books: getBooksByBookIds.bind(this, author.books),
+      createdAt: new Date(author._doc.createdAt).toISOString(),
+      updatedAt: new Date(author._doc.updatedAt).toISOString()
     }
   })
 }
@@ -72,7 +75,8 @@ module.exports = {
     return users.map(user => {
       return {
         ...user._doc,
-        createdDate: new Date(user._doc.createdDate).toISOString()
+        createdAt: new Date(user._doc.createdAt).toISOString(),
+        updatedAt: new Date(user._doc.updatedAt).toISOString()
       }
     })
   },
@@ -84,7 +88,6 @@ module.exports = {
       firstName: authorInput.firstName,
       lastName: authorInput.lastName,
       description: authorInput.description,
-      createdDate: new Date(),
       books: []
     })
 
@@ -96,20 +99,21 @@ module.exports = {
   createBook: async args => {
     const { bookInput } = args
 
+    const hardCodedAuthorId = '5c5794c06512891bcc4446a6'
+
     const book = new Book({
       title: bookInput.title,
       description: bookInput.description,
-      createdDate: new Date(),
 
       //  hardcoding an author value
-      authors: ['5c57304490026e2358a5a2a6']
+      authors: [hardCodedAuthorId]
     })
 
     try {
       const savedBook = await book.save()
 
       //  add this book to the appropriate author's "books" list
-      await addBookToAuthor('5c57304490026e2358a5a2a6', savedBook)
+      await addBookToAuthor(hardCodedAuthorId, savedBook)
 
       console.log('saved book', savedBook)
 
@@ -133,8 +137,7 @@ module.exports = {
       .then(hashedPassword => {
         const newUser = new User({
           email: userInput.email,
-          password: hashedPassword,
-          createdDate: new Date()
+          password: hashedPassword
         })
 
         return newUser.save()
@@ -145,7 +148,8 @@ module.exports = {
         return {
           ...newUser._doc,
           password: null,
-          createdDate: new Date(newUser._doc.createdDate).toISOString()
+          createdAt: new Date(newUser._doc.createdAt).toISOString(),
+          updatedAt: new Date(newUser._doc.updatedAt).toISOString()
         }
       })
       .catch(err => {
