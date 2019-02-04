@@ -4,26 +4,61 @@ const Author = require('../../models/author')
 const Book = require('../../models/book')
 const User = require('../../models/user')
 
+const inflateBooks = books => {
+  return books.map(book => {
+    return {
+      ...book._doc,
+      createdDate: new Date(book._doc.createdDate).toISOString(),
+      authors: getAuthorsByAuthorIds.bind(this, book.authors)
+    }
+  })
+}
+
+const inflateAuthors = authors => {
+  return authors.map(author => {
+    return {
+      ...author._doc,
+      createdDate: new Date(author._doc.createdDate).toISOString(),
+      books: getBooksByBookIds.bind(this, author.books)
+    }
+  })
+}
+
+const getBooksByBookIds = async bookIds => {
+  const books = await Book.find({ _id: { $in: bookIds } })
+
+  return inflateBooks(books)
+}
+
+const getAuthorsByAuthorIds = async authorIds => {
+  const authors = await Author.find({ _id: { $in: authorIds } })
+
+  return inflateAuthors(authors)
+}
+
+const addBookToAuthor = async (authorId, book) => {
+  const author = await Author.findById(authorId)
+
+  if (!author) {
+    throw new Error('Author was not found')
+  }
+
+  author.books.push(book)
+
+  const savedAuthor = await author.save()
+  return savedAuthor
+}
+
 module.exports = {
   authors: async () => {
-    const authors = await Author.find().populate('books')
+    const authors = await Author.find()
 
-    return authors.map(author => {
-      return {
-        ...author._doc,
-        createdDate: new Date(author._doc.createdDate).toISOString()
-      }
-    })
+    return inflateAuthors(authors)
   },
   books: async () => {
     try {
-      const books = await Book.find().populate('authors')
-      return books.map(book => {
-        return {
-          ...book._doc,
-          createdDate: new Date(book._doc.createdDate).toISOString()
-        }
-      })
+      const books = await Book.find()
+      return inflateBooks(books)
     } catch (err) {
       console.log(err)
       throw err
@@ -54,7 +89,9 @@ module.exports = {
     })
 
     const savedAuthor = await author.save()
-    return savedAuthor
+
+    const inflatedAuthor = inflateAuthors([savedAuthor])[0]
+    return inflatedAuthor
   },
   createBook: async args => {
     const { bookInput } = args
@@ -72,23 +109,12 @@ module.exports = {
       const savedBook = await book.save()
 
       //  add this book to the appropriate author's "books" list
-      const author = await Author.findById('5c57304490026e2358a5a2a6')
-
-      if (!author) {
-        throw new Error('Author was not found')
-      }
-
-      author.books.push(book)
-      await author.save()
+      await addBookToAuthor('5c57304490026e2358a5a2a6', savedBook)
 
       console.log('saved book', savedBook)
-      return savedBook
 
-      //  uncomment if we want to include the Author information in the return value
-      // const retBook = await Book.findById(savedBook._id).populate('authors')
-
-      // console.log('retbook', retBook)
-      // return retBook
+      const inflatedBook = inflateBooks([savedBook])[0]
+      return inflatedBook
     } catch (err) {
       console.error(err)
     }
