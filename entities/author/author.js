@@ -20,7 +20,11 @@ const authors = async () => {
   return formatAuthors(authors)
 }
 
-const createAuthor = async args => {
+const createAuthor = async (args, req) => {
+  if (!req.isAuth) {
+    throw new Error('Unauthenticated!')
+  }
+
   const { authorInput } = args
 
   const author = new Author({

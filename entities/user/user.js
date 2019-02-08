@@ -15,7 +15,7 @@ const users = async () => {
   })
 }
 
-const createUser = args => {
+const createUser = (args, req) => {
   const { userInput } = args
 
   return User.findOne({ email: userInput.email })

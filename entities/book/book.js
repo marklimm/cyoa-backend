@@ -12,7 +12,11 @@ const books = async () => {
   }
 }
 
-const createBook = async args => {
+const createBook = async (args, req) => {
+  if (!req.isAuth) {
+    throw new Error('Unauthenticated!')
+  }
+
   const { bookInput } = args
 
   const hardCodedAuthorId = '5c5794c06512891bcc4446a6'
