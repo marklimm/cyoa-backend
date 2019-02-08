@@ -1,18 +1,11 @@
 const { buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
-    type Book {
-      _id: ID!
-      title: String!
-      description: String!
-      authors: [Author!]
-      createdAt: String!
-      updatedAt: String!
-    }
 
-    input BookInput {
-      title: String!
-      description: String!
+    type AuthData {
+      userId: ID!
+      token: String!
+      tokenExpiration: Int!
     }
 
     type Author {
@@ -31,6 +24,20 @@ module.exports = buildSchema(`
       description: String
     }
 
+    type Book {
+      _id: ID!
+      title: String!
+      description: String!
+      authors: [Author!]
+      createdAt: String!
+      updatedAt: String!
+    }
+
+    input BookInput {
+      title: String!
+      description: String!
+    }
+
     type User {
       _id: ID!
       email: String!
@@ -47,6 +54,7 @@ module.exports = buildSchema(`
     type RootQuery {
       authors: [Author!]!
       books: [Book!]!
+      login(email: String!, password: String!): AuthData!
       users: [User!]!
     }
 
