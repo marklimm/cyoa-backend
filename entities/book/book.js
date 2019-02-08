@@ -1,6 +1,6 @@
-const Book = require('../../models/book')
-const { formatBooks } = require('../../helpers/inflateRelatedEntities')
-const { addBookToAuthor } = require('./author')
+const Book = require('./book-model')
+const { formatBooks } = require('../entity-relations/author-book')
+const { addBookToAuthor } = require('../author/author')
 
 const books = async () => {
   try {

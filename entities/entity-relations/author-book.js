@@ -1,5 +1,5 @@
-const Author = require('../models/author')
-const Book = require('../models/book')
+const Author = require('../author/author-model')
+const Book = require('../book/book-model')
 
 const formatAuthors = authors => {
   return authors.map(author => {

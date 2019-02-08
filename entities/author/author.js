@@ -1,5 +1,5 @@
-const Author = require('../../models/author')
-const { formatAuthors } = require('../../helpers/inflateRelatedEntities')
+const Author = require('./author-model')
+const { formatAuthors } = require('../entity-relations/author-book')
 
 const addBookToAuthor = async (authorId, book) => {
   const author = await Author.findById(authorId)
