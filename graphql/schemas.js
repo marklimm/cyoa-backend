@@ -14,6 +14,7 @@ module.exports = buildSchema(`
       lastName: String!
       description: String
       books: [Book!]
+      
       createdAt: String!
       updatedAt: String!
     }
@@ -29,6 +30,7 @@ module.exports = buildSchema(`
       title: String!
       description: String!
       authors: [Author!]
+
       createdAt: String!
       updatedAt: String!
     }
@@ -41,13 +43,18 @@ module.exports = buildSchema(`
     type User {
       _id: ID!
       email: String!
+      firstName: String!
+      lastName: String!
       password: String
+
       createdAt: String!
       updatedAt: String!
     }
 
     input UserInput {
       email: String!
+      firstName: String!
+      lastName: String!
       password: String!
     }
 

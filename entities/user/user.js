@@ -29,6 +29,8 @@ const createUser = (args, req) => {
     .then(hashedPassword => {
       const newUser = new User({
         email: userInput.email,
+        firstName: userInput.firstName,
+        lastName: userInput.lastName,
         password: hashedPassword
       })
 
@@ -44,6 +46,7 @@ const createUser = (args, req) => {
     })
     .catch(err => {
       console.log(err)
+      throw err
     })
 }
 

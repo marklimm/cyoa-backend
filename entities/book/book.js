@@ -39,6 +39,7 @@ const createBook = async (args, req) => {
     return inflatedBook
   } catch (err) {
     console.error(err)
+    throw err
   }
 }
 
