@@ -15,7 +15,7 @@ const addBookToAuthor = async (authorId, book) => {
 }
 
 const authors = async () => {
-  const authors = await Author.find()
+  const authors = await Author.find().sort({ firstName: 1, lastName: 1 })
 
   return formatAuthors(authors)
 }

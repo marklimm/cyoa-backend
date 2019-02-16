@@ -4,7 +4,7 @@ const { addBookToAuthor } = require('../author/author')
 
 const books = async () => {
   try {
-    const books = await Book.find()
+    const books = await Book.find().sort({ title: 1 })
     return formatBooks(books)
   } catch (err) {
     console.log(err)
