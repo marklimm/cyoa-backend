@@ -23,9 +23,7 @@ const createUser = async (args, req) => {
 
     if (user) {
       return {
-        errors: [
-          { message: 'Sorry, email is already taken' }
-        ]
+        errors: [{ message: 'Sorry, email is already taken' }]
       }
     }
 
@@ -60,24 +58,24 @@ const login = async ({ email, password }) => {
 
     if (!user) {
       return {
-        errors: [
-          { message: friendlyFailedLoginMessage }
-        ]
+        errors: [{ message: friendlyFailedLoginMessage }]
       }
     }
 
     const passwordMatched = await bcrypt.compare(password, user.password)
     if (!passwordMatched) {
       return {
-        errors: [
-          { message: friendlyFailedLoginMessage }
-        ]
+        errors: [{ message: friendlyFailedLoginMessage }]
       }
     }
 
-    const token = jwt.sign({ userId: user.id, email: user.email }, 'some-seecret-keyyyy', {
-      expiresIn: '1h'
-    })
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      'some-seecret-keyyyy',
+      {
+        expiresIn: '1h'
+      }
+    )
 
     return {
       userId: user.id,

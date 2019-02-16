@@ -27,19 +27,28 @@ app.use((req, res, next) => {
 
 app.use(isAuth)
 
-app.use('/graphql', graphqlHttp({
-  schema: graphQlSchema,
-  rootValue: graphQlResolvers,
-  graphiql: true
-}))
+app.use(
+  '/graphql',
+  graphqlHttp({
+    schema: graphQlSchema,
+    rootValue: graphQlResolvers,
+    graphiql: true
+  })
+)
 
 app.get('/', (req, res, next) => {
   res.send('hello test wossssrld')
 })
 
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@cluster0-qmxzo.mongodb.net/${process.env.CYOA_DB}?retryWrites=true`, {
-  useNewUrlParser: true
-})
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGO_USER}:${
+      process.env.MONGO_PASSWORD
+    }@cluster0-qmxzo.mongodb.net/${process.env.CYOA_DB}?retryWrites=true`,
+    {
+      useNewUrlParser: true
+    }
+  )
   .then(() => {
     app.listen(3001)
   })
