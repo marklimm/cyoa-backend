@@ -15,60 +15,78 @@ const users = async () => {
   })
 }
 
-const createUser = (args, req) => {
+const createUser = async (args, req) => {
   const { userInput } = args
 
-  return User.findOne({ email: userInput.email })
-    .then(user => {
-      if (user) {
-        throw new Error('Email is already taken')
-      }
+  try {
+    const user = await User.findOne({ email: userInput.email })
 
-      return bcrypt.hash(userInput.password, 12)
-    })
-    .then(hashedPassword => {
-      const newUser = new User({
-        email: userInput.email,
-        firstName: userInput.firstName,
-        lastName: userInput.lastName,
-        password: hashedPassword
-      })
-
-      return newUser.save()
-    })
-    .then(newUser => {
+    if (user) {
       return {
-        ...newUser._doc,
-        password: null,
-        createdAt: new Date(newUser._doc.createdAt).toISOString(),
-        updatedAt: new Date(newUser._doc.updatedAt).toISOString()
+        errors: [
+          { message: 'Sorry, email is already taken' }
+        ]
       }
+    }
+
+    const hashedPassword = await bcrypt.hash(userInput.password, 12)
+
+    const newUser = new User({
+      email: userInput.email,
+      firstName: userInput.firstName,
+      lastName: userInput.lastName,
+      password: hashedPassword
     })
-    .catch(err => {
-      console.log(err)
-      throw err
-    })
+
+    const savedNewUser = await newUser.save()
+
+    return {
+      ...savedNewUser._doc,
+      password: null,
+      createdAt: new Date(newUser._doc.createdAt).toISOString(),
+      updatedAt: new Date(newUser._doc.updatedAt).toISOString()
+    }
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 }
 
 const login = async ({ email, password }) => {
-  const user = await User.findOne({ email: email })
-  if (!user) {
-    throw new Error('User does not exist!')
-  }
+  try {
+    const user = await User.findOne({ email: email })
 
-  const passwordMatched = await bcrypt.compare(password, user.password)
-  if (!passwordMatched) {
-    throw new Error('Password was incorrect!')
-  }
+    const friendlyFailedLoginMessage = 'Sorry, that login failed'
 
-  const token = jwt.sign({ userId: user.id, email: user.email }, 'some-seecret-keyyyy', {
-    expiresIn: '1h'
-  })
+    if (!user) {
+      return {
+        errors: [
+          { message: friendlyFailedLoginMessage }
+        ]
+      }
+    }
 
-  return {
-    userId: user.id,
-    token: token,
-    tokenExpiration: 1
+    const passwordMatched = await bcrypt.compare(password, user.password)
+    if (!passwordMatched) {
+      return {
+        errors: [
+          { message: friendlyFailedLoginMessage }
+        ]
+      }
+    }
+
+    const token = jwt.sign({ userId: user.id, email: user.email }, 'some-seecret-keyyyy', {
+      expiresIn: '1h'
+    })
+
+    return {
+      userId: user.id,
+      token: token,
+      tokenExpiration: 1
+    }
+  } catch (err) {
+    console.log(err)
+    throw err
   }
 }
 
