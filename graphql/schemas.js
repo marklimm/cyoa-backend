@@ -38,13 +38,6 @@ module.exports = buildSchema(`
     message: String!
   }
 
-  type LoginResponse {
-    errors: [Error!]
-    token: String
-    tokenExpiration: Int
-    userId: ID
-  }
-
   type User {
     _id: ID!
     email: String!
@@ -55,7 +48,15 @@ module.exports = buildSchema(`
     createdAt: String!
     updatedAt: String!
   }
-
+  
+  type UserAuthResponse {
+    errors: [Error!]
+    firstName: String
+    token: String
+    tokenExpiration: Int
+    userId: ID
+  }
+  
   input UserInput {
     email: String!
     firstName: String!
@@ -63,22 +64,17 @@ module.exports = buildSchema(`
     password: String!
   }
 
-  type UserResponse {
-    errors: [Error!]
-    user: User
-  }
-
   type RootQuery {
     authors: [Author!]!
     books: [Book!]!
-    login(email: String!, password: String!): LoginResponse!
+    login(email: String!, password: String!): UserAuthResponse!
     users: [User!]!
   }
 
   type RootMutation {
     createAuthor(authorInput: AuthorInput) : Author
     createBook(bookInput: BookInput) : Book
-    createUser(userInput: UserInput) : UserResponse!
+    createUser(userInput: UserInput) : UserAuthResponse!
   }
   
   schema {

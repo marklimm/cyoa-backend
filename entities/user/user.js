@@ -15,6 +15,23 @@ const users = async () => {
   })
 }
 
+const getUserAuthCredentials = user => {
+  const token = jwt.sign(
+    { userId: user.id, email: user.email },
+    'some-seecret-keyyyy',
+    {
+      expiresIn: '2h'
+    }
+  )
+
+  return {
+    userId: user.id,
+    firstName: user.firstName,
+    token: token,
+    tokenExpiration: 1
+  }
+}
+
 const createUser = async (args, req) => {
   const { userInput } = args
 
@@ -38,12 +55,7 @@ const createUser = async (args, req) => {
 
     const savedNewUser = await newUser.save()
 
-    return {
-      ...savedNewUser._doc,
-      password: null,
-      createdAt: new Date(newUser._doc.createdAt).toISOString(),
-      updatedAt: new Date(newUser._doc.updatedAt).toISOString()
-    }
+    return getUserAuthCredentials(savedNewUser)
   } catch (err) {
     console.log(err)
     throw err
@@ -69,19 +81,7 @@ const login = async ({ email, password }) => {
       }
     }
 
-    const token = jwt.sign(
-      { userId: user.id, email: user.email },
-      'some-seecret-keyyyy',
-      {
-        expiresIn: '1h'
-      }
-    )
-
-    return {
-      userId: user.id,
-      token: token,
-      tokenExpiration: 1
-    }
+    return getUserAuthCredentials(user)
   } catch (err) {
     console.log(err)
     throw err
