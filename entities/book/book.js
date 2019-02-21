@@ -14,7 +14,10 @@ const books = async () => {
 
 const createBook = async (args, req) => {
   if (!req.isAuth) {
-    throw new Error('Unauthenticated!')
+    // throw new Error('Unauthenticated!')
+    return {
+      errors: [{ message: 'You are not authenticated to create a book' }]
+    }
   }
 
   const { bookInput } = args

@@ -19,6 +19,11 @@ module.exports = buildSchema(`
     description: String
   }
 
+  type AuthorResponse {
+    author: Author!
+    errors: [Error!]
+  }
+
   type Book {
     _id: ID!
     title: String!
@@ -32,6 +37,11 @@ module.exports = buildSchema(`
   input BookInput {
     title: String!
     description: String!
+  }
+
+  type BookResponse {
+    book: Book!
+    errors: [Error!]
   }
 
   type Error {
@@ -56,7 +66,7 @@ module.exports = buildSchema(`
     tokenExpiration: Int
     userId: ID
   }
-  
+
   input UserInput {
     email: String!
     firstName: String!
@@ -72,8 +82,8 @@ module.exports = buildSchema(`
   }
 
   type RootMutation {
-    createAuthor(authorInput: AuthorInput) : Author
-    createBook(bookInput: BookInput) : Book
+    createAuthor(authorInput: AuthorInput) : AuthorResponse
+    createBook(bookInput: BookInput) : BookResponse
     createUser(userInput: UserInput) : UserAuthResponse!
   }
   

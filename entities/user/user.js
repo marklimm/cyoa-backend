@@ -4,15 +4,20 @@ const jwt = require('jsonwebtoken')
 const User = require('./user-model')
 
 const users = async () => {
-  const users = await User.find()
+  try {
+    const users = await User.find()
 
-  return users.map(user => {
-    return {
-      ...user._doc,
-      createdAt: new Date(user._doc.createdAt).toISOString(),
-      updatedAt: new Date(user._doc.updatedAt).toISOString()
-    }
-  })
+    return users.map(user => {
+      return {
+        ...user._doc,
+        createdAt: new Date(user._doc.createdAt).toISOString(),
+        updatedAt: new Date(user._doc.updatedAt).toISOString()
+      }
+    })
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 }
 
 const getUserAuthCredentials = user => {

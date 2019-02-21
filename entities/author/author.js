@@ -2,27 +2,49 @@ const Author = require('./author-model')
 const { formatAuthors } = require('../entity-relations/author-book')
 
 const addBookToAuthor = async (authorId, book) => {
-  const author = await Author.findById(authorId)
+  try {
+    const author = await Author.findById(authorId)
 
-  if (!author) {
-    throw new Error('Author was not found')
+    if (!author) {
+      return {
+        errors: [
+          {
+            message: `Attempt to add a book to an author failed because the author wasn't found`
+          }
+        ]
+      }
+    }
+
+    author.books.push(book)
+
+    const savedAuthor = await author.save()
+    return savedAuthor
+  } catch (err) {
+    console.log(err)
+    throw err
   }
-
-  author.books.push(book)
-
-  const savedAuthor = await author.save()
-  return savedAuthor
 }
 
 const authors = async () => {
-  const authors = await Author.find().sort({ firstName: 1, lastName: 1 })
+  try {
+    const authors = await Author.find().sort({ firstName: 1, lastName: 1 })
 
-  return formatAuthors(authors)
+    return formatAuthors(authors)
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 }
 
 const createAuthor = async (args, req) => {
   if (!req.isAuth) {
-    throw new Error('Unauthenticated!')
+    return {
+      errors: [
+        {
+          message: `You are not authenticated to create an author`
+        }
+      ]
+    }
   }
 
   const { authorInput } = args
@@ -34,10 +56,15 @@ const createAuthor = async (args, req) => {
     books: []
   })
 
-  const savedAuthor = await author.save()
+  try {
+    const savedAuthor = await author.save()
 
-  const inflatedAuthor = formatAuthors([savedAuthor])[0]
-  return inflatedAuthor
+    const inflatedAuthor = formatAuthors([savedAuthor])[0]
+    return inflatedAuthor
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
 }
 
 module.exports = {
