@@ -20,7 +20,7 @@ module.exports = buildSchema(`
   }
 
   type AuthorResponse {
-    author: Author!
+    author: Author
     errors: [Error!]
   }
 
@@ -40,7 +40,7 @@ module.exports = buildSchema(`
   }
 
   type BookResponse {
-    book: Book!
+    book: Book
     errors: [Error!]
   }
 
