@@ -39,7 +39,10 @@ const createBook = async (args, req) => {
     await addBookToAuthor(hardCodedAuthorId, savedBook)
 
     const inflatedBook = formatBooks([savedBook])[0]
-    return inflatedBook
+
+    return {
+      book: inflatedBook
+    }
   } catch (err) {
     console.error(err)
     throw err

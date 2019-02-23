@@ -60,7 +60,10 @@ const createAuthor = async (args, req) => {
     const savedAuthor = await author.save()
 
     const inflatedAuthor = formatAuthors([savedAuthor])[0]
-    return inflatedAuthor
+
+    return {
+      author: inflatedAuthor
+    }
   } catch (err) {
     console.log(err)
     throw err
