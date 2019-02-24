@@ -8,6 +8,10 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
+    password: {
+      type: String,
+      required: true
+    },
     firstName: {
       type: String,
       required: true
@@ -16,10 +20,16 @@ const userSchema = new Schema(
       type: String,
       required: true
     },
-    password: {
+    bio: {
       type: String,
-      required: true
-    }
+      required: false
+    },
+    books: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: 'Book'
+      }
+    ]
   },
   { timestamps: true }
 )

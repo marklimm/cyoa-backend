@@ -44,28 +44,30 @@ module.exports = buildSchema(`
     createdAt: String!
     updatedAt: String!
   }
-  
+
+  input UserInput {
+    email: String!
+    password: String!
+
+    firstName: String!
+    lastName: String!
+    bio: String
+  }
+
   type UserResponse {
     errors: [Error!]
     user: User
     auth: Authentication
   }
 
-  input UserInput {
-    email: String!
-    firstName: String!
-    lastName: String!
-    password: String!
-  }
-
   type RootQuery {
     books: [Book!]!
-    login(email: String!, password: String!): UserAuthResponse!
+    login(email: String!, password: String!): UserResponse!
     users: [User!]!
   }
 
   type RootMutation {
-    createBook(bookInput: BookInput) : BookResponse
+    createBook(bookInput: BookInput) : BookResponse!
     createUser(userInput: UserInput) : UserResponse!
   }
   

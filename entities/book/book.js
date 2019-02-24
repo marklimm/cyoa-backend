@@ -1,6 +1,6 @@
 const Book = require('./book-model')
-const { formatBooks } = require('../entity-relations/author-book')
-const { addBookToAuthor } = require('../author/author')
+const { formatBooks } = require('../entity-relations/user-book')
+const { addBookToUser } = require('../user/user')
 
 const books = async () => {
   try {
@@ -14,7 +14,6 @@ const books = async () => {
 
 const createBook = async (args, req) => {
   if (!req.isAuth) {
-    // throw new Error('Unauthenticated!')
     return {
       errors: [{ message: 'You are not authenticated to create a book' }]
     }
@@ -22,21 +21,21 @@ const createBook = async (args, req) => {
 
   const { bookInput } = args
 
-  const hardCodedAuthorId = '5c5794c06512891bcc4446a6'
+  const hardCodedUserId = '5c730f4168c9233eac032e52'
 
   const book = new Book({
     title: bookInput.title,
     description: bookInput.description,
 
     //  hardcoding an author value
-    authors: [hardCodedAuthorId]
+    authors: [hardCodedUserId]
   })
 
   try {
     const savedBook = await book.save()
 
     //  add this book to the appropriate author's "books" list
-    await addBookToAuthor(hardCodedAuthorId, savedBook)
+    await addBookToUser(hardCodedUserId, savedBook)
 
     const inflatedBook = formatBooks([savedBook])[0]
 
