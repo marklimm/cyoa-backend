@@ -21,7 +21,7 @@ const createBook = async (args, req) => {
 
   const { bookInput } = args
 
-  const hardCodedUserId = '5c730f4168c9233eac032e52'
+  const hardCodedUserId = req.userId
 
   const book = new Book({
     title: bookInput.title,
