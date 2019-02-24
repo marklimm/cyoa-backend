@@ -2,33 +2,16 @@ const { buildSchema } = require('graphql')
 
 module.exports = buildSchema(`
 
-  type Author {
-    _id: ID!
-    firstName: String!
-    lastName: String!
-    description: String
-    books: [Book!]
-    
-    createdAt: String!
-    updatedAt: String!
-  }
-
-  input AuthorInput {
-    firstName: String!
-    lastName: String!
-    description: String
-  }
-
-  type AuthorResponse {
-    author: Author
-    errors: [Error!]
+  type Authentication {
+    token: String
+    tokenExpiration: Int
   }
 
   type Book {
     _id: ID!
     title: String!
     description: String!
-    authors: [Author!]
+    authors: [User!]
 
     createdAt: String!
     updatedAt: String!
@@ -51,20 +34,21 @@ module.exports = buildSchema(`
   type User {
     _id: ID!
     email: String!
+    password: String
+
     firstName: String!
     lastName: String!
-    password: String
+    bio: String
+    books: [Book!]
 
     createdAt: String!
     updatedAt: String!
   }
   
-  type UserAuthResponse {
+  type UserResponse {
     errors: [Error!]
-    firstName: String
-    token: String
-    tokenExpiration: Int
-    userId: ID
+    user: User
+    auth: Authentication
   }
 
   input UserInput {
@@ -75,16 +59,14 @@ module.exports = buildSchema(`
   }
 
   type RootQuery {
-    authors: [Author!]!
     books: [Book!]!
     login(email: String!, password: String!): UserAuthResponse!
     users: [User!]!
   }
 
   type RootMutation {
-    createAuthor(authorInput: AuthorInput) : AuthorResponse
     createBook(bookInput: BookInput) : BookResponse
-    createUser(userInput: UserInput) : UserAuthResponse!
+    createUser(userInput: UserInput) : UserResponse!
   }
   
   schema {
