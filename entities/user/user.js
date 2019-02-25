@@ -83,7 +83,7 @@ const createUser = async (args, req) => {
       password: hashedPassword,
       firstName: userInput.firstName,
       lastName: userInput.lastName,
-      bio: userInput.bio,
+      bio: userInput.bio || '',
       books: []
     })
 
