@@ -18,8 +18,9 @@ module.exports = buildSchema(`
   }
 
   input BookInput {
-    title: String!
-    description: String!
+    id: ID
+    title: String
+    description: String
   }
 
   type BookResponse {
@@ -69,6 +70,8 @@ module.exports = buildSchema(`
   type RootMutation {
     createBook(bookInput: BookInput) : BookResponse!
     createUser(userInput: UserInput) : UserResponse!
+    deleteBook(bookInput: BookInput) : BookResponse!
+    updateBook(bookInput: BookInput) : BookResponse!
   }
   
   schema {

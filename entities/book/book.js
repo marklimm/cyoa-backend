@@ -24,8 +24,8 @@ const createBook = async (args, req) => {
   const hardCodedUserId = req.userId
 
   const book = new Book({
-    title: bookInput.title,
-    description: bookInput.description,
+    title: bookInput.title || '',
+    description: bookInput.description || '',
 
     //  hardcoding an author value
     authors: [hardCodedUserId]
@@ -48,7 +48,65 @@ const createBook = async (args, req) => {
   }
 }
 
+const updateBook = async (args, req) => {
+  // if (!req.isAuth) {
+  //   return {
+  //     errors: [{ message: 'You are not authenticated to edit a book' }]
+  //   }
+  // }
+
+  const { bookInput } = args
+
+  try {
+    const book = await Book.findOne({ _id: bookInput.id })
+
+    if (!book) {
+      return {
+        errors: [{ message: 'Sorry, that book was not found' }]
+      }
+    }
+
+    book.title = bookInput.title || ''
+    book.description = bookInput.description || ''
+    const savedBook = await book.save()
+
+    return {
+      book: formatBooks([savedBook])[0]
+    }
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
+const deleteBook = async (args, req) => {
+  // if (!req.isAuth) {
+  //   return {
+  //     errors: [{ message: 'You are not authenticated to edit a book' }]
+  //   }
+  // }
+
+  const { bookInput } = args
+
+  try {
+    const book = await Book.deleteOne({ _id: bookInput.id })
+
+    console.log('book', book)
+
+    return {
+      book: {
+        _id: bookInput.id
+      }
+    }
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
 module.exports = {
   books,
-  createBook
+  createBook,
+  deleteBook,
+  updateBook
 }
