@@ -25,7 +25,7 @@ const createBook = async (args, req) => {
 
   const book = new Book({
     title: bookInput.title || '',
-    description: bookInput.description || '',
+    description: decodeURI(bookInput.description) || '',
 
     //  hardcoding an author value
     authors: [hardCodedUserId]
@@ -67,7 +67,7 @@ const updateBook = async (args, req) => {
     }
 
     book.title = bookInput.title || ''
-    book.description = bookInput.description || ''
+    book.description = decodeURI(bookInput.description) || ''
 
     const savedBook = await book.save()
 
