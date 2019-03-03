@@ -18,7 +18,7 @@ module.exports = buildSchema(`
   }
 
   input BookInput {
-    id: ID
+    _id: ID
     title: String
     description: String
   }

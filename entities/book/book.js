@@ -80,22 +80,22 @@ const updateBook = async (args, req) => {
 }
 
 const deleteBook = async (args, req) => {
-  // if (!req.isAuth) {
-  //   return {
-  //     errors: [{ message: 'You are not authenticated to edit a book' }]
-  //   }
-  // }
+  if (!req.isAuth) {
+    return {
+      errors: [{ message: 'You are not authenticated to edit a book' }]
+    }
+  }
 
   const { bookInput } = args
 
   try {
-    const book = await Book.deleteOne({ _id: bookInput.id })
+    const book = await Book.deleteOne({ _id: bookInput._id })
 
     console.log('book', book)
 
     return {
       book: {
-        _id: bookInput.id
+        _id: bookInput._id
       }
     }
   } catch (err) {
