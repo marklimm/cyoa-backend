@@ -14,7 +14,8 @@ const formatBooks = books => {
   return books.map(book => {
     return {
       ...book._doc,
-      authors: getUsersByUserIds.bind(this, book.authors)
+      authors: getUsersByUserIds.bind(this, book.authors),
+      description: decodeURI(book.description)
     }
   })
 }

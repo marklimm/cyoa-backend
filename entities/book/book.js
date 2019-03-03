@@ -49,16 +49,16 @@ const createBook = async (args, req) => {
 }
 
 const updateBook = async (args, req) => {
-  // if (!req.isAuth) {
-  //   return {
-  //     errors: [{ message: 'You are not authenticated to edit a book' }]
-  //   }
-  // }
+  if (!req.isAuth) {
+    return {
+      errors: [{ message: 'You are not authenticated to edit a book' }]
+    }
+  }
 
   const { bookInput } = args
 
   try {
-    const book = await Book.findOne({ _id: bookInput.id })
+    const book = await Book.findOne({ _id: bookInput._id })
 
     if (!book) {
       return {
@@ -68,6 +68,7 @@ const updateBook = async (args, req) => {
 
     book.title = bookInput.title || ''
     book.description = bookInput.description || ''
+
     const savedBook = await book.save()
 
     return {
