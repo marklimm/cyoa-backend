@@ -48,6 +48,43 @@ const createBook = async (args, req) => {
   }
 }
 
+const deleteBook = async (args, req) => {
+  if (!req.isAuth) {
+    return {
+      errors: [{ message: 'You are not authenticated to edit a book' }]
+    }
+  }
+
+  const { bookInput } = args
+
+  try {
+    const bookToDelete = Book.findOne({
+      _id: bookInput._id,
+      authors: req.userId
+    })
+
+    if (!bookToDelete) {
+      return {
+        errors: [{ message: 'You are not authorized to delete this book' }]
+      }
+    }
+
+    await Book.deleteOne({
+      _id: bookInput._id,
+      authors: req.userId
+    })
+
+    return {
+      book: {
+        _id: bookInput._id
+      }
+    }
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
 const updateBook = async (args, req) => {
   if (!req.isAuth) {
     return {
@@ -73,31 +110,6 @@ const updateBook = async (args, req) => {
 
     return {
       book: formatBooks([savedBook])[0]
-    }
-  } catch (err) {
-    console.log(err)
-    throw err
-  }
-}
-
-const deleteBook = async (args, req) => {
-  if (!req.isAuth) {
-    return {
-      errors: [{ message: 'You are not authenticated to edit a book' }]
-    }
-  }
-
-  const { bookInput } = args
-
-  try {
-    const book = await Book.deleteOne({ _id: bookInput._id })
-
-    console.log('book', book)
-
-    return {
-      book: {
-        _id: bookInput._id
-      }
     }
   } catch (err) {
     console.log(err)
