@@ -95,11 +95,14 @@ const updateBook = async (args, req) => {
   const { bookInput } = args
 
   try {
-    const book = await Book.findOne({ _id: bookInput._id })
+    const book = await Book.findOne({
+      _id: bookInput._id,
+      authors: req.userId
+    })
 
     if (!book) {
       return {
-        errors: [{ message: 'Sorry, that book was not found' }]
+        errors: [{ message: 'You are not authorized to edit this book' }]
       }
     }
 
