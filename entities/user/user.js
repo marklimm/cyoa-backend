@@ -6,16 +6,10 @@ const { formatUsers } = require('../entity-relations/user-book')
 
 const users = async () => {
   try {
+    console.log('User.find()')
     const users = await User.find().sort({ firstName: 1, lastName: 1 })
 
     return formatUsers(users)
-    // return users.map(user => {
-    //   return {
-    //     ...user._doc,
-    //     createdAt: new Date(user._doc.createdAt).toISOString(),
-    //     updatedAt: new Date(user._doc.updatedAt).toISOString()
-    //   }
-    // })
   } catch (err) {
     console.log(err)
     throw err

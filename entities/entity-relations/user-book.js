@@ -1,7 +1,19 @@
+const DataLoader = require('dataloader')
+
 const User = require('../user/user-model')
 const Book = require('../book/book-model')
 
-const formatUsers = users => {
+const bookLoader = new DataLoader(bookIds => {
+  console.log('bookLoader Book.find()', bookIds)
+  return Book.find({ _id: { $in: bookIds } })
+})
+
+const userLoader = new DataLoader(userIds => {
+  console.log('userLoader User.find()', userIds)
+  return User.find({ _id: { $in: userIds } })
+})
+
+const formatUsers = async users => {
   return users.map(user => {
     return {
       ...user._doc,
@@ -20,13 +32,16 @@ const formatBooks = books => {
 }
 
 const getUsersByUserIds = async userIds => {
-  const users = await User.find({ _id: { $in: userIds } })
+  console.log('getUsersByUserIds', userIds)
+
+  const users = await userLoader.loadMany(userIds.map(ui => ui.toString()))
 
   return formatUsers(users)
 }
 
 const getBooksByBookIds = async bookIds => {
-  const books = await Book.find({ _id: { $in: bookIds } })
+  console.log('getBooksByBookIds', bookIds)
+  const books = await bookLoader.loadMany(bookIds.map(ui => ui.toString()))
 
   return formatBooks(books)
 }
