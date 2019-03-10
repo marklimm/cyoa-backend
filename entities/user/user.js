@@ -4,18 +4,6 @@ const jwt = require('jsonwebtoken')
 const User = require('./user-model')
 const { formatUsers } = require('../entity-relations/user-book')
 
-const users = async () => {
-  try {
-    console.log('User.find()')
-    const users = await User.find().sort({ firstName: 1, lastName: 1 })
-
-    return formatUsers(users)
-  } catch (err) {
-    console.log(err)
-    throw err
-  }
-}
-
 const addBookToUser = async (userId, book) => {
   try {
     const user = await User.findById(userId)
@@ -37,24 +25,6 @@ const addBookToUser = async (userId, book) => {
   } catch (err) {
     console.log(err)
     throw err
-  }
-}
-
-const getUserAuthCredentials = user => {
-  const token = jwt.sign(
-    { userId: user.id, email: user.email },
-    'some-seecret-keyyyy',
-    {
-      expiresIn: '2h'
-    }
-  )
-
-  return {
-    user,
-    auth: {
-      token: token,
-      tokenExpiration: 2
-    }
   }
 }
 
@@ -93,6 +63,48 @@ const createUser = async (args, req) => {
   }
 }
 
+const deleteBookFromUser = async (userId, bookId) => {
+  try {
+    const user = await User.findById(userId)
+
+    if (!user) {
+      return {
+        errors: [
+          {
+            message: `Attempt to delete a book from author failed because the author wasn't found`
+          }
+        ]
+      }
+    }
+
+    user.books = user.books.filter(id => id.toString() !== bookId.toString())
+
+    const savedUser = await user.save()
+    return savedUser
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
+const getUserAuthCredentials = user => {
+  const token = jwt.sign(
+    { userId: user.id, email: user.email },
+    'some-seecret-keyyyy',
+    {
+      expiresIn: '2h'
+    }
+  )
+
+  return {
+    user,
+    auth: {
+      token: token,
+      tokenExpiration: 2
+    }
+  }
+}
+
 const login = async ({ email, password }) => {
   try {
     const user = await User.findOne({ email: email })
@@ -119,9 +131,22 @@ const login = async ({ email, password }) => {
   }
 }
 
+const users = async () => {
+  try {
+    console.log('User.find()')
+    const users = await User.find().sort({ firstName: 1, lastName: 1 })
+
+    return formatUsers(users)
+  } catch (err) {
+    console.log(err)
+    throw err
+  }
+}
+
 module.exports = {
   addBookToUser,
   createUser,
+  deleteBookFromUser,
   login,
   users
 }

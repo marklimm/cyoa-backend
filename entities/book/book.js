@@ -1,6 +1,6 @@
 const Book = require('./book-model')
 const { formatBooks } = require('../entity-relations/user-book')
-const { addBookToUser } = require('../user/user')
+const { addBookToUser, deleteBookFromUser } = require('../user/user')
 
 const books = async () => {
   try {
@@ -21,21 +21,20 @@ const createBook = async (args, req) => {
 
   const { bookInput } = args
 
-  const hardCodedUserId = req.userId
+  const authorUserId = req.userId
 
   const book = new Book({
     title: bookInput.title || '',
     description: decodeURI(bookInput.description) || '',
 
-    //  hardcoding an author value
-    authors: [hardCodedUserId]
+    authors: [authorUserId]
   })
 
   try {
     const savedBook = await book.save()
 
     //  add this book to the appropriate author's "books" list
-    await addBookToUser(hardCodedUserId, savedBook)
+    await addBookToUser(authorUserId, savedBook)
 
     const inflatedBook = formatBooks([savedBook])[0]
 
@@ -58,21 +57,19 @@ const deleteBook = async (args, req) => {
   const { bookInput } = args
 
   try {
-    const bookToDelete = Book.findOne({
-      _id: bookInput._id,
-      authors: req.userId
-    })
+    const bookResult = await getBook(bookInput._id, req.userId)
 
-    if (!bookToDelete) {
-      return {
-        errors: [{ message: 'You are not authorized to delete this book' }]
-      }
+    if (bookResult.errors) {
+      return bookResult
     }
 
     await Book.deleteOne({
       _id: bookInput._id,
       authors: req.userId
     })
+
+    //  delete this book from the appropriate author's "books" list
+    await deleteBookFromUser(req.userId, bookInput._id)
 
     return {
       book: {
@@ -82,6 +79,25 @@ const deleteBook = async (args, req) => {
   } catch (err) {
     console.log(err)
     throw err
+  }
+}
+
+const getBook = async (bookId, userId) => {
+  const book = await Book.findOne({
+    _id: bookId,
+    authors: userId
+  })
+
+  if (!book) {
+    return {
+      errors: [
+        { message: 'You do not have authorization to edit/delete this book' }
+      ]
+    }
+  }
+
+  return {
+    book: book
   }
 }
 
@@ -95,17 +111,13 @@ const updateBook = async (args, req) => {
   const { bookInput } = args
 
   try {
-    const book = await Book.findOne({
-      _id: bookInput._id,
-      authors: req.userId
-    })
+    const bookResult = await getBook(bookInput._id, req.userId)
 
-    if (!book) {
-      return {
-        errors: [{ message: 'You are not authorized to edit this book' }]
-      }
+    if (bookResult.errors) {
+      return bookResult
     }
 
+    const { book } = bookResult
     book.title = bookInput.title || ''
     book.description = decodeURI(bookInput.description) || ''
 
