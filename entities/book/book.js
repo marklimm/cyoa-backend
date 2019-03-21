@@ -4,7 +4,9 @@ const { addBookToUser, deleteBookFromUser } = require('../user/user')
 
 const books = async () => {
   try {
+    console.log('Book.find().sort({ title: 1 })')
     const books = await Book.find().sort({ title: 1 })
+
     return formatBooks(books)
   } catch (err) {
     console.log(err)

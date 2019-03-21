@@ -4,46 +4,70 @@ const User = require('../user/user-model')
 const Book = require('../book/book-model')
 
 const bookLoader = new DataLoader(bookIds => {
-  console.log('bookLoader Book.find()', bookIds)
-  return Book.find({ _id: { $in: bookIds } })
+  return getBooksByBookIds(bookIds)
 })
+console.log('bookLoader new DataLoader()')
 
 const userLoader = new DataLoader(userIds => {
-  console.log('userLoader User.find()', userIds)
-  return User.find({ _id: { $in: userIds } })
+  return getUsersByUserIds(userIds)
 })
-
-const formatUsers = async users => {
-  return users.map(user => {
-    return {
-      ...user._doc,
-      books: getBooksByBookIds.bind(this, user.books)
-    }
-  })
-}
+console.log('userLoader new DataLoader()')
 
 const formatBooks = books => {
   return books.map(book => {
     return {
       ...book._doc,
-      authors: getUsersByUserIds.bind(this, book.authors)
+      // authors: () => getUsersByUserIds(book.authors)
+      authors: async () => {
+        const authorIds = book.authors.map(ui => ui.toString())
+        const res = await userLoader.loadMany(authorIds)
+
+        return res
+      }
     }
   })
 }
 
-const getUsersByUserIds = async userIds => {
-  console.log('getUsersByUserIds', userIds)
+const formatUsers = async users => {
+  return users.map(user => {
+    return {
+      ...user._doc,
+      bio: user.bio || '',
+      // books: () => getBooksByBookIds(user.books)
+      books: async () => {
+        const bookIds = user.books.map(bi => bi.toString())
+        const res = await bookLoader.loadMany(bookIds)
 
-  const users = await userLoader.loadMany(userIds.map(ui => ui.toString()))
-
-  return formatUsers(users)
+        return res
+      }
+    }
+  })
 }
 
 const getBooksByBookIds = async bookIds => {
-  console.log('getBooksByBookIds', bookIds)
-  const books = await bookLoader.loadMany(bookIds.map(ui => ui.toString()))
+  console.log('Book.find({ _id: { $in: bookIds }', bookIds)
+  const books = await Book.find({ _id: { $in: bookIds } })
 
-  return formatBooks(books)
+  const orderedBookResults = sortResultsByRequestedIds(bookIds, books)
+  return formatBooks(orderedBookResults)
+}
+
+const getUsersByUserIds = async userIds => {
+  console.log('User.find({ _id: { $in: userIds }', userIds)
+  const users = await User.find({ _id: { $in: userIds } })
+
+  const orderedUserResults = sortResultsByRequestedIds(userIds, users)
+  return formatUsers(orderedUserResults)
+}
+
+const sortResultsByRequestedIds = (ids, results) => {
+  let orderedResults = []
+  ids.forEach(id => {
+    const foundEntity = results.find(entity => entity._id.toString() === id)
+    orderedResults.push(foundEntity)
+  })
+
+  return orderedResults
 }
 
 module.exports = {
