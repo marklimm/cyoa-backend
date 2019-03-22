@@ -2,19 +2,20 @@ const Book = require('./book-model')
 const { formatBooks } = require('../entity-relations/user-book')
 const { addBookToUser, deleteBookFromUser } = require('../user/user')
 
-const books = async () => {
+const books = async (args, { loaders, contextCreationTime }) => {
+  console.log('request contextCreationTime', contextCreationTime)
   try {
     console.log('Book.find().sort({ title: 1 })')
     const books = await Book.find().sort({ title: 1 })
 
-    return formatBooks(books)
+    return formatBooks(books, loaders)
   } catch (err) {
     console.log(err)
     throw err
   }
 }
 
-const createBook = async (args, req) => {
+const createBook = async (args, { req, loaders }) => {
   if (!req.isAuth) {
     return {
       errors: [{ message: 'You are not authenticated to create a book' }]
@@ -38,7 +39,7 @@ const createBook = async (args, req) => {
     //  add this book to the appropriate author's "books" list
     await addBookToUser(authorUserId, savedBook)
 
-    const inflatedBook = formatBooks([savedBook])[0]
+    const inflatedBook = formatBooks([savedBook], loaders)[0]
 
     return {
       book: inflatedBook
@@ -49,7 +50,7 @@ const createBook = async (args, req) => {
   }
 }
 
-const deleteBook = async (args, req) => {
+const deleteBook = async (args, { req }) => {
   if (!req.isAuth) {
     return {
       errors: [{ message: 'You are not authenticated to edit a book' }]
@@ -103,7 +104,7 @@ const getBook = async (bookId, userId) => {
   }
 }
 
-const updateBook = async (args, req) => {
+const updateBook = async (args, { req, loaders }) => {
   if (!req.isAuth) {
     return {
       errors: [{ message: 'You are not authenticated to edit a book' }]
@@ -126,7 +127,7 @@ const updateBook = async (args, req) => {
     const savedBook = await book.save()
 
     return {
-      book: formatBooks([savedBook])[0]
+      book: formatBooks([savedBook], loaders)[0]
     }
   } catch (err) {
     console.log(err)

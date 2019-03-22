@@ -28,7 +28,7 @@ const addBookToUser = async (userId, book) => {
   }
 }
 
-const createUser = async (args, req) => {
+const createUser = async args => {
   const { userInput } = args
 
   try {
@@ -131,12 +131,12 @@ const login = async ({ email, password }) => {
   }
 }
 
-const users = async () => {
+const users = async (args, { loaders }) => {
   try {
     console.log('User.find()')
     const users = await User.find().sort({ firstName: 1, lastName: 1 })
 
-    return formatUsers(users)
+    return formatUsers(users, loaders)
   } catch (err) {
     console.log(err)
     throw err

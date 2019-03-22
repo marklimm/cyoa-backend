@@ -8,6 +8,11 @@ const graphQlResolvers = require('./graphql/resolvers')
 
 const isAuth = require('./middleware/is-auth')
 
+const {
+  getBookLoader,
+  getUserLoader
+} = require('./entities/entity-relations/user-book')
+
 const app = express()
 
 app.use(express.json())
@@ -29,10 +34,20 @@ app.use(isAuth)
 
 app.use(
   '/graphql',
-  graphqlHttp({
-    schema: graphQlSchema,
-    rootValue: graphQlResolvers,
-    graphiql: true
+  graphqlHttp(req => {
+    return {
+      schema: graphQlSchema,
+      rootValue: graphQlResolvers,
+      graphiql: true,
+      context: {
+        ...req,
+        contextCreationTime: new Date(),
+        loaders: {
+          bookLoader: getBookLoader(),
+          userLoader: getUserLoader()
+        }
+      }
+    }
   })
 )
 
