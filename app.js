@@ -57,9 +57,9 @@ app.get('/', (req, res, next) => {
 
 mongoose
   .connect(
-    `mongodb+srv://${process.env.MONGO_USER}:${
-      process.env.MONGO_PASSWORD
-    }@cluster0-qmxzo.mongodb.net/${process.env.CYOA_DB}?retryWrites=true`,
+    `mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${
+      process.env.MONGO_CLUSTER_NAME
+    }/${process.env.CYOA_DB}?retryWrites=true`,
     {
       useNewUrlParser: true
     }
