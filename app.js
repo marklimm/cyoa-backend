@@ -40,7 +40,7 @@ app.use(
       rootValue: graphQlResolvers,
       graphiql: true,
       context: {
-        ...req,
+        req,
         contextCreationTime: new Date(),
         loaders: {
           bookLoader: getBookLoader(),
