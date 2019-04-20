@@ -64,6 +64,7 @@ module.exports = buildSchema(`
   type RootQuery {
     books: [Book!]!
     login(email: String!, password: String!): UserResponse!
+    user(id: ID): [User!]!
     users: [User!]!
   }
 

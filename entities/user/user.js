@@ -131,6 +131,19 @@ const login = async ({ email, password }) => {
   }
 }
 
+const user = async ({ id }, { loaders }) => {
+  try {
+    const foundUser = await User.findById(id)
+
+    const result = formatUsers([foundUser], loaders)
+    return result
+  } catch (err) {
+    console.log(err)
+    // throw err
+    return []
+  }
+}
+
 const users = async (args, { loaders }) => {
   try {
     console.log('User.find()')
@@ -148,5 +161,6 @@ module.exports = {
   createUser,
   deleteBookFromUser,
   login,
+  user,
   users
 }
