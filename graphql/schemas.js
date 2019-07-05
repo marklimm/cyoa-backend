@@ -12,6 +12,7 @@ module.exports = buildSchema(`
     title: String!
     description: String!
     authors: [User!]
+    tags: [Tag!]
 
     createdAt: String!
     updatedAt: String!
@@ -21,6 +22,7 @@ module.exports = buildSchema(`
     _id: ID
     title: String
     description: String
+    tags: [ID!]
   }
 
   type BookResponse {
@@ -30,6 +32,21 @@ module.exports = buildSchema(`
 
   type Error {
     message: String!
+  }
+
+  type Tag {
+    _id: ID!
+    label: String!
+  }
+
+  input TagInput {
+    _id: ID
+    label: String
+  }
+
+  type TagResponse {
+    tag: Tag
+    errors: [Error!]
   }
 
   type User {
@@ -64,12 +81,14 @@ module.exports = buildSchema(`
   type RootQuery {
     books: [Book!]!
     login(email: String!, password: String!): UserResponse!
+    tags: [Tag!]!
     user(id: ID): [User!]!
     users: [User!]!
   }
 
   type RootMutation {
     createBook(bookInput: BookInput) : BookResponse!
+    createTag(tagInput: TagInput) : TagResponse!
     createUser(userInput: UserInput) : UserResponse!
     deleteBook(bookInput: BookInput) : BookResponse!
     updateBook(bookInput: BookInput) : BookResponse!

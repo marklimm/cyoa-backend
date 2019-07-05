@@ -10,6 +10,7 @@ const isAuth = require('./middleware/is-auth')
 
 const {
   getBookLoader,
+  getTagLoader,
   getUserLoader
 } = require('./entities/entity-relations/user-book')
 
@@ -44,6 +45,7 @@ app.use(
         contextCreationTime: new Date(),
         loaders: {
           bookLoader: getBookLoader(),
+          tagLoader: getTagLoader(),
           userLoader: getUserLoader()
         }
       }

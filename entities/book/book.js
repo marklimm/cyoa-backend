@@ -3,9 +3,7 @@ const { formatBooks } = require('../entity-relations/user-book')
 const { addBookToUser, deleteBookFromUser } = require('../user/user')
 
 const books = async (args, { loaders, contextCreationTime }) => {
-  console.log('request contextCreationTime', contextCreationTime)
   try {
-    console.log('Book.find().sort({ title: 1 })')
     const books = await Book.find().sort({ title: 1 })
 
     return formatBooks(books, loaders)
@@ -30,7 +28,8 @@ const createBook = async (args, { req, loaders }) => {
     title: bookInput.title || '',
     description: decodeURI(bookInput.description) || '',
 
-    authors: [authorUserId]
+    authors: [authorUserId],
+    tags: bookInput.tags || []
   })
 
   try {
@@ -123,6 +122,7 @@ const updateBook = async (args, { req, loaders }) => {
     const { book } = bookResult
     book.title = bookInput.title || ''
     book.description = decodeURI(bookInput.description) || ''
+    book.tags = bookInput.tags || []
 
     const savedBook = await book.save()
 

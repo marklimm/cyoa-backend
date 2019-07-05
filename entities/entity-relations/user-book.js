@@ -1,17 +1,22 @@
 const DataLoader = require('dataloader')
 
-const User = require('../user/user-model')
 const Book = require('../book/book-model')
+const Tag = require('../tag/tag-model')
+const User = require('../user/user-model')
 
 const getBookLoader = () => {
-  console.log('bookLoader new DataLoader()')
   return new DataLoader(bookIds => {
     return getBooksByBookIds(bookIds)
   })
 }
 
+const getTagLoader = () => {
+  return new DataLoader(tagIds => {
+    return getTagsByTagIds(tagIds)
+  })
+}
+
 const getUserLoader = () => {
-  console.log('userLoader new DataLoader()')
   return new DataLoader(userIds => {
     return getUsersByUserIds(userIds)
   })
@@ -21,12 +26,17 @@ const formatBooks = (books, loaders) => {
   return books.map(book => {
     return {
       ...book._doc,
-      // authors: () => getUsersByUserIds(book.authors)
       authors: async () => {
-        const authorIds = book.authors.map(ui => ui.toString())
+        const authorIds = book.authors.map(authorId => authorId.toString())
         const res = await loaders.userLoader.loadMany(authorIds)
 
         return formatUsers(res, loaders)
+      },
+      tags: async () => {
+        const tagIds = book.tags.map(tagId => tagId.toString())
+        const res = await loaders.tagLoader.loadMany(tagIds)
+
+        return res
       }
     }
   })
@@ -37,7 +47,6 @@ const formatUsers = async (users, loaders) => {
     return {
       ...user._doc,
       bio: user.bio || '',
-      // books: () => getBooksByBookIds(user.books)
       books: async () => {
         const bookIds = user.books.map(bi => bi.toString())
         const res = await loaders.bookLoader.loadMany(bookIds)
@@ -57,8 +66,15 @@ const getBooksByBookIds = async bookIds => {
   return orderedBookResults
 }
 
+const getTagsByTagIds = async tagIds => {
+  const tags = await Tag.find({ _id: { $in: tagIds } })
+
+  const orderedTagResults = sortResultsByRequestedIds(tagIds, tags)
+
+  return orderedTagResults
+}
+
 const getUsersByUserIds = async userIds => {
-  console.log('User.find({ _id: { $in: userIds }', userIds)
   const users = await User.find({ _id: { $in: userIds } })
 
   const orderedUserResults = sortResultsByRequestedIds(userIds, users)
@@ -80,5 +96,6 @@ module.exports = {
   formatUsers,
   formatBooks,
   getBookLoader,
+  getTagLoader,
   getUserLoader
 }
